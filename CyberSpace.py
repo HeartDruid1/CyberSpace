@@ -23,12 +23,14 @@ gameDisplay = pygame.display.set_mode( (display_width,display_height) )#setup wi
 pygame.display.set_caption('CyberSpace') #changes window title
 clock = pygame.time.Clock()#game time / FPS controller
 
-rocketImg = pygame.image.load('assets/badass-rocket.png')
-rocketImg2 = pygame.image.load('assets/badass-rocket2.png')
-rocketImg3 = pygame.image.load('assets/badass-rocket3.png')
+rocketImg = pygame.image.load('assets/badass-rocket.png').convert()
+rocketImg2 = pygame.image.load('assets/badass-rocket2.png').convert()
+rocketImg3 = pygame.image.load('assets/badass-rocket3.png').convert()
 
-FloppyImg = pygame.image.load('assets/floppy.png')
-EmailImg = pygame.image.load('assets/email.png')
+FloppyImg = pygame.image.load('assets/floppy.png').convert()
+EmailImg = pygame.image.load('assets/email.png').convert()
+
+#Peformance Increase on older machines with '.convert()' function
 
 Background = pygame.image.load('assets/cyberspace2.png') #not to  be used until easier to see
 CyberFont = pygame.font.Font('assets/computer_pixel-7.ttf',30)
