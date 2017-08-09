@@ -91,6 +91,7 @@ def game_intro():
 						#returns error and crashes but it does its intended purpose (fix if desired but isn't needed)
 						pygame.quit()
 						quit()
+			print(event)
 
 		if menuChoice == 'play':
 			start = message_render("Start",CyberFont, 75, GREEN)
@@ -154,6 +155,7 @@ def game_loop():
 			if event.type == pygame.KEYUP: # condition if the key pressed was lifted
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT: # condition if keys were left or right
 					x_change = 0 # stop moving
+			print(event) #debug tool 
 
 		x_rocket += x_change
 
@@ -171,9 +173,11 @@ def game_loop():
 		
 
 		if x_rocket > display_width - rocket_width: #if rocket goes beyond epic walls stop movement and set X value to the border
+			print('right wall')
 			x_rocket = display_width - rocket_width
 
 		elif x_rocket < 0:
+			print('left wall')
 			x_rocket = 0
 
         #resets obstacle(s)
@@ -185,6 +189,7 @@ def game_loop():
 			dodged += (1 + thing_speed)
 
 		if collide(x_rocket,y_rocket,rocket_width,rocket_height,thing_startx,thing_starty,thing_type[1],thing_height):
+			print("Collide")
 			kerploo()
 			time.sleep(2)
 			game_loop()
