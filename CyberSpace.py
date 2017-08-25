@@ -33,12 +33,22 @@ EmailImg = pygame.image.load('assets/email.png').convert()
 Background = pygame.image.load('assets/cyberspace2.png') #not to  be used until easier to see
 CyberFont = 'assets/computer_pixel-7.ttf'
 
+#All sound from freesound.org
+pygame.mixer.music.load("assets/in_gamemusic.mp3")
+point_get = pygame.mixer.Sound('assets/point.wav')
+select = pygame.mixer.Sound('assets/select.wav')
+game_start = pygame.mixer.Sound('assets/explosion1.wav')
+kerploo_sound = pygame.mixer.Sound('assets/kerploo.wav')
+
 rocket_width = 30
 rocket_height = 66
 
-def things(thingx, thingy, thingw, thingh, thing_Type):
+def thing1(thingx, thingy, thingw, thingh, thing_Type): #low-key Dr Seuss reference ;)
     #the coordinates for the obstacles to draw
 	gameDisplay.blit(thing_Type,(thingx,thingy, thingw, thingh)) #boundaries are applicable to collision
+
+def thing2(thingx, thingy, thingw, thingh, thing_Type):
+	gameDisplay.blit(thing_Type,(thingx,thingy, thingw, thingh))
 
 def rocket(x,y,listOfRockets): #function to draw awesome graphic
 	thruster_adjust = random.choice(listOfRockets) #small utility for thruster animation (chooses from rocket images)
@@ -80,17 +90,22 @@ def game_intro():
 				quit()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_UP:
+					pygame.mixer.Sound.play(select)
 					menuChoice = 'play'
+					pygame.mixer.Sound.play(select)
 				elif event.key == pygame.K_DOWN:
+					pygame.mixer.Sound.play(select)
 					menuChoice = 'quit'
-					
 				elif event.key == pygame.K_RETURN:
 					if menuChoice == 'play':
+						pygame.mixer.Sound.play(game_start)
+						time.sleep(1)
 						game_loop()
 					elif menuChoice == 'quit':
 						#returns error and crashes but it does its intended purpose (fix if desired but isn't needed)
 						pygame.quit()
 						quit()
+			print(event)
 
 		if menuChoice == 'play':
 			start = message_render("Start",CyberFont, 75, GREEN)
@@ -116,9 +131,12 @@ def game_intro():
 def kerploo():
 	kerploo = message_render("GAME OVER!",CyberFont,30,GREEN)
 	gameDisplay.blit(kerploo,((display_width / 2)-30, display_height / 2))
+	pygame.mixer.music.stop()
+	pygame.mixer.Sound.play(kerploo_sound)
 	pygame.display.update()
 
 def game_loop():
+	pygame.mixer.music.play(-1)
 	pygame.display.set_caption('CyberSpace is running at '+str(int(clock.get_fps()))+' FPS') #changes window title
 
 	list_rockets = [rocketImg, rocketImg2, rocketImg3]
@@ -128,13 +146,16 @@ def game_loop():
 	x_change = 0
 
 	thing_list = [FloppyImg,EmailImg]
-	thing_startx = random.randrange(0, (display_width - 100))
-	thing_starty = -600
+	thing1_startx = random.randrange(0, (display_width - 100))
+	thing2_startx = random.randrange(0, (display_width - 100))
+	thing1_starty = random.randrange(-600, 0)
+	thing2_starty = random.randrange(-600, 0)
 	thing_speed = 5 
 	floppy_width = 100
 	thing_height = 100
 	email_width = 150
-	thing_type = thing_return(thing_list)
+	thing1_type = thing_return(thing_list)
+	thing2_type = thing_return(thing_list)
 
 	dodged = 0
 	gameExit = False #condition for the game to keep running
@@ -154,13 +175,16 @@ def game_loop():
 			if event.type == pygame.KEYUP: # condition if the key pressed was lifted
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT: # condition if keys were left or right
 					x_change = 0 # stop moving
+			print(event) #debug tool 
 
 		x_rocket += x_change
 
 		#background()#creates new frame by drawing over last frame
 		gameDisplay.fill(BLACK)
-		things(thing_startx, thing_starty, thing_type[1], thing_height,thing_type[0])
-		thing_starty += thing_speed
+		thing1(thing1_startx, thing1_starty, thing1_type[1], thing_height, thing1_type[0])
+		thing2(thing2_startx, thing2_starty, thing2_type[1], thing_height, thing2_type[0])
+		thing1_starty += thing_speed
+		thing2_starty += thing_speed
 		rocket(x_rocket, y_rocket, list_rockets) #function call to display badass-rocket
 
 		#display text
@@ -171,24 +195,45 @@ def game_loop():
 		
 
 		if x_rocket > display_width - rocket_width: #if rocket goes beyond epic walls stop movement and set X value to the border
+			print('right wall')
+			x_change = 0
 			x_rocket = display_width - rocket_width
 
 		elif x_rocket < 0:
+			print('left wall')
+			x_change = 0
 			x_rocket = 0
 
         #resets obstacle(s)
-		if thing_starty > display_height:
-			thing_type = thing_return(thing_list)
-			thing_starty = 0 - thing_height
-			thing_startx = random.randrange(0,(display_width - (thing_type[1] - 1))) # -1 included to avoid sprite duplication along borders
-			thing_speed += 0.50
-			dodged += (1 + thing_speed)
+		if thing1_starty > display_height:
+			thing1_type = thing_return(thing_list)
+			thing1_starty = random.randrange(-400, 0)
+			thing1_startx = random.randrange(0,(display_width - (thing1_type[1] - 1))) # -1 included to avoid sprite duplication along borders
+			thing_speed += 0.25
+			dodged += (random.randint(1,5) + thing_speed)
+			pygame.mixer.Sound.play(point_get)
 
-		if collide(x_rocket,y_rocket,rocket_width,rocket_height,thing_startx,thing_starty,thing_type[1],thing_height):
+		if thing2_starty > display_height:
+			thing2_type = thing_return(thing_list)
+			thing2_starty = random.randrange(-400, 0)
+			thing2_startx = random.randrange(0,(display_width - (thing2_type[1] - 1)))
+			thing_speed += 0.25
+			dodged += (random.randint(1,5) + thing_speed)
+			pygame.mixer.Sound.play(point_get)
+
+		if collide(x_rocket,y_rocket,rocket_width,rocket_height,thing1_startx,thing1_starty,thing1_type[1],thing_height):
+			print("Collide")
 			kerploo()
 			time.sleep(2)
 			game_loop()
-	   
+	  
+		if collide(x_rocket,y_rocket,rocket_width,rocket_height,thing2_startx,thing2_starty,thing2_type[1],thing_height):
+			print("Collide")
+			kerploo()
+			time.sleep(2)
+			game_loop()
+
+ 
 		pygame.display.update() #updates the window completely
 		clock.tick(FPS) #frames per second control
 
