@@ -16,5 +16,5 @@ Use the left and right arrows to move your Rad Rocket(TM) from side to side.
 -Rewind (looks like the Rewind icon on every TV remote ever)
  Slows down the obstacles
 
-###Contact
+### Contact
 Send me a message on Twitter [@sh0esBDriftin](https://twitter.com/sh0esbdriftin)
